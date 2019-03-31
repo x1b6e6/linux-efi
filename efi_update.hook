@@ -1,0 +1,13 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux
+Target = mkinitcpio
+Target = amd-ucode
+Target = mkinitcpio-busybox
+
+[Action]
+Description = update kernel in efi partition
+When = PostTransaction
+Exec = /usr/local/bin/efi_update.sh linux
