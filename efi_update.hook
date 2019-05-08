@@ -5,9 +5,9 @@ Type = Package
 Target = linux
 Target = mkinitcpio
 Target = amd-ucode
-Target = mkinitcpio-busybox
+Target = linux-old
 
 [Action]
 Description = update kernel in efi partition
 When = PostTransaction
-Exec = /usr/local/bin/efi_update.sh linux
+Exec = /usr/bin/efi_update linux
