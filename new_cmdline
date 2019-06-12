@@ -1,0 +1,1 @@
+root=UUID=70b6ceb2-59d4-4499-9e24-4854ce523ed1 cryptdevice=UUID=671453da-b1f0-4746-b3b1-6a172cf563fd:encrypted cryptkey=/dev/disk/by-uuid/4A93-A392:vfat:/key rw resume=UUID=5b0e987a-7b7e-4ecd-9642-c923f926a474 efi=runtime acpi_backlight=vendor atkbd.reset i8042.nomux quiet

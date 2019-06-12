@@ -1,10 +1,10 @@
 # Maintainer: Jguer <joaogg3@gmail.com>
 pkgname=linux-old
-pkgver=0.1.0
-pkgrel=2
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="old files"
 arch=('i686' 'x86_64' 'armv7h' 'armv6h' 'aarch64')
-
+depends=('binutils' 'sbsigntools' 'efibootmgr')
 
 source=(
 	"efi_update.sh"
@@ -15,7 +15,7 @@ source=(
 	"ldlocal.conf"
 )
 sha1sums=(
-	'4feb2f6e0b94691a42c414624fea82e79b0463c8'
+	'9a8845398be3b8bd5b3eea963c54981fde74241c'
 	'00bba33f5cb898708791cf00b0bfd461d32700d4'
 	'44a1bfb86c0d2605f0fc3ba8fe345c1227dd27ee'
 	'e64a5d44dd4f4b346502a61fd7ad955191c80397'

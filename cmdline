@@ -1,0 +1,1 @@
+root=/dev/encrypted/root cryptdevice=UUID=671453da-b1f0-4746-b3b1-6a172cf563fd:encrypted cryptkey=/dev/disk/by-uuid/4A93-A392:vfat:/key rw resume=/dev/mapper/encrypted-swap efi=runtime acpi_backlight=vendor atkbd.reset i8042.nomux quiet
