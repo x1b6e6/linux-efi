@@ -58,6 +58,7 @@ chmod 600 $TMP
 
 echo -n "kernel param: "
 CMDLINE=$(grep -vh "#" $CMDLINED/* | sed ':a;N;$!ba;s/\n/ /g')
+echo $CMDLINE
 
 cat ${INITRAMFS} > $TMP_INITRD
 
@@ -79,7 +80,7 @@ echo $CMDLINE "emergency" > $TMP_CMDLINE_EMERGENCY
     ${EFISTUB} ${TMP_EMERGENCY}
 
 while :; do 
-(expect << EOF
+	expect << EOF
 set timeout 120
 spawn /usr/bin/sbsign --key ${CERTDIR}/key.key --cert ${CERTDIR}/key.crt --output ${TMP_BOOT_SIGNED} ${TMP_BOOT}
 expect "*?phrase:*"
@@ -90,7 +91,8 @@ stty echo
 send -- "\$pass"
 expect { 
 	"Signing Unsigned original image" {wait}
-	"*error*" {exit 1}
+	"bad decrypt" {exit 1}
+	"bad password" {exit 2}
 }
 	
 
@@ -99,10 +101,16 @@ expect "*?phrase:*"
 send -- "\$pass"
 expect {
 	"Signing Unsigned original image" {wait}
-	"*error*" {exit 1}
+	"bad decrypt" {exit 1}
+	"bad password {exit 2}
 }
 EOF
-) && break;done
+	sig=$?
+	case $sig in
+		0)break;;
+		130)exit 1;;
+	esac
+done
 
 mount -o rw,remount /boot/efi
 cp ${TMP_BOOT_SIGNED} ${OUTIMG}
