@@ -113,7 +113,7 @@ EOF
 done
 
 mount -o rw,remount /boot/efi
-cp ${TMP_BOOT_SIGNED} ${OUTIMG}
+cp ${TMP_BOOT_SIGNED} ${OUTIMG_BOOT}
 cp ${TMP_EMERGENCY_SIGNED} ${OUTIMG_DIR}/$LINUX-emergency.efi
 mount -o ro,remount /boot/efi
 

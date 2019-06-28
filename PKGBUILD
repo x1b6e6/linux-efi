@@ -15,7 +15,7 @@ source=(
 	"linux-efi.install"
 )
 sha1sums=(
-	'ac20314fd53ab52ab93e1a7431c29c4baedd088e'
+	'e299eb6055553bc4b35274e51e3fbf13e1f5011c'
 	'00bba33f5cb898708791cf00b0bfd461d32700d4'
 	'44a1bfb86c0d2605f0fc3ba8fe345c1227dd27ee'
 	'e64a5d44dd4f4b346502a61fd7ad955191c80397'
