@@ -1,0 +1,60 @@
+CMDLINED=/etc/cmdline.d
+
+
+cwrite() {
+	local TMP=$3
+	local FILE=$CMDLINED/$(printf "%02d" $1)-$2.conf
+	[[ -e $FILE ]] && TMP="$(cat $FILE) $TMP"
+	echo "$TMP" > $FILE
+}
+
+post_install() {
+	CMDLINE=$(cat /proc/cmdline)
+
+	if [[ -e $CMDLINED ]]; then
+		echo "$CMDLINED already exist, abort"
+		exit 0
+	fi
+
+	mkdir $CMDLINED
+
+	for var in $CMDLINE; do
+		varname=$(awk -F= '{print $1}' <<< "$var")
+
+		case $varname in
+			root)
+				cwrite 0 "root" "$var"
+				;;
+			rw)
+				cwrite 0 "root" "$var"
+				;;
+			ro)
+				cwrite 0 "root" "$var"
+				;;
+			cryptdevice)
+				cwrite 5 "crypto" "$var"
+				;;
+			cryptkey)
+				cwrite 5 "crypto" "$var"
+				;;
+			resume)
+				cwrite 10 "resume" "$var"
+				;;
+			quiet);;
+			slash);;
+			emergency);;
+			rescue);;
+			*)
+				cwrite 20 "$varname" "$var"
+				;;
+		esac
+	done
+}
+
+post_upgrade() {
+	post_install
+}
+
+post_remove() {
+	rm -r $CMDLINED
+}

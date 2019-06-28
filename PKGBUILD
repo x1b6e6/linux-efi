@@ -1,6 +1,6 @@
 # Maintainer: Jguer <joaogg3@gmail.com>
 pkgname=linux-efi
-pkgver=0.1.1
+pkgver=0.1.2
 pkgrel=1
 pkgdesc="sign efi hook"
 arch=('any')
@@ -12,6 +12,7 @@ source=(
 	"reboot-win10"
 	"reboot-grub"
 	"efikeys.tar.xz"
+	"linux-efi.install"
 )
 sha1sums=(
 	'ac20314fd53ab52ab93e1a7431c29c4baedd088e'
@@ -19,7 +20,10 @@ sha1sums=(
 	'44a1bfb86c0d2605f0fc3ba8fe345c1227dd27ee'
 	'e64a5d44dd4f4b346502a61fd7ad955191c80397'
 	'984f298fb1cd268ddc83bcaac0b868e4d2e8c92e'
+	'7f873b781daa12fbb226e7889469cf4691116191'
 )
+
+install='linux-efi.install'
 
 package() {
 	cd "$srcdir"
