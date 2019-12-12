@@ -1,0 +1,121 @@
+
+CMDLINED=/etc/cmdline.d
+TMP=/tmp/linux${mod}_efi
+TMP_CMDLINED=$TMP/cmdline.di
+EFIKEYS=/etc/efikeys
+
+pre_upgrade() {
+	mkdir $TMP
+}
+post_upgrade() {
+	rm -rf $TMP
+}
+
+pre_install() {
+	pre_upgrade
+}
+
+post_install() {
+	if [[ ! -x $(which openssl) ]]; then
+		# TODO: error: openssl unknown version installed?
+		return
+	elif [[ ! -x $(which efivar) ]]; then
+		# TODO: error: efivar unknown version installed?
+		return
+	elif [[ ! -x $(which efibootmgr) ]]; then
+		# TODO: error: efibootmgr unknown version installed?
+		return
+	fi
+
+	[[ -e /etc/efi.key.pem || -e /etc/efi.pub.pem ]] && 
+		echo "warn: keys already generated. skip generate new keys" || 
+		keys_gen_install
+
+	[[ -e $CMDLINED ]] && 
+		echo "warn: $CMDLINED already exists. skip generate new configs" || 
+		cmdlined_gen_install
+
+	# TODO: check enable SecureBoot, and try install certs to it
+
+	post_upgrade
+}
+
+err() {
+    echo $* >&2
+    exit 1
+}
+
+keys_gen_install() {
+	# generate keys    
+    openssl req -newkey rsa:4096 -nodes -keyout $TMP/key.pem -new -x509 -sha256 -days 3650 -subj "/CN=my Platform Key/" -out $TMP/pub.pem
+    #openssl genrsa -out $TMP/key.pem 4096 || err generating key
+	#openssl x509 -in $TMP/key.pem -outform PEM -pubkey -out $TMP/pub.pem || err extracting public key
+	
+    # convert public key to efi sign list
+	cert-to-efi-sig-list $TMP/pub.pem $TMP/efi.esl || err converting pub key to efi sign list
+
+	# add to list MicroSoft keys for supporting dualboot
+	cat $EFIKEYS/ms.esl $TMP/efi.esl > $TMP/db.esl
+
+	# signing keys for using secureboot
+	sign-efi-sig-list -k $TMP/key.pem -c $TMP/pub.pem PK $TMP/efi.esl $TMP/PK.auth || err signing PK
+	sign-efi-sig-list -k $TMP/key.pem -c $TMP/pub.pem KEK $TMP/efi.esl $TMP/KEK.auth || err signing KEK
+	sign-efi-sig-list -k $TMP/key.pem -c $TMP/pub.pem db $TMP/db.esl $TMP/db.auth || err signing db
+
+	# install keys
+	install -Dm400 $TMP/key.pem /etc/efi.key.pem
+	install -Dm444 $TMP/pub.pem /etc/efi.pub.pem
+
+	# install keys to $EFIKEYS
+	install -Dm444 $TMP/PK.auth $EFIKEYS/
+	install -Dm444 $TMP/KEK.auth $EFIKEYS/
+	install -Dm444 $TMP/db.auth $EFIKEYS/
+
+	# cleanup $TMP dir
+	rm $TMP/key.pem
+	rm $TMP/pub.pem
+
+	rm $TMP/efi.esl
+
+	rm $TMP/db.esl
+
+	rm $TMP/PK.auth
+	rm $TMP/KEK.auth
+	rm $TMP/db.auth
+}
+
+_cmdwrite() {
+	local TMP=$3
+	local FILE=$CMDLINED/$(printf "%02d" $1)-$2.conf
+	[[ -e $FILE ]] && TMP="$(cat $FILE)\n$TMP"
+	echo $TMP > $FILE
+}
+
+cmdlined_gen_install() {
+	local CMDLINE=$(cat /proc/cmdline)
+
+	if [[ -e $CMDLINED ]]; then
+		echo "$CMDLINED already exists, abort"
+		return
+	fi
+
+	mkdir $TMP_CMDLINED
+
+	for var in $CMDLINE; do
+		local varname=$(awk -F=' ' '{print $1}' <<< "$var")
+
+		case $varname in
+			root,ro,rw)
+				_cmdwrite 0 root "$var";;
+			cryptdevice,cryptkey)
+				_cmdwrite 5 crypto "$var";;
+			resume)
+				_cmdwrite 10 resume "$var";;
+			quiet,splash,emergency,rescue);;
+			*)
+				_cmdwrite 20 $varname "$var";;
+		esac
+	done
+}
+ 
+# vim: set ts=4 sw=0 noexpandtab autoindent :

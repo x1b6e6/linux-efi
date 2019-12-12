@@ -2,12 +2,12 @@
 Operation = Install
 Operation = Upgrade
 Type = Package
-Target = linux
+Target = /boot/vmlinux-linux%mod%
+Target = linux%mod%
 Target = mkinitcpio
 Target = amd-ucode
-Target = linux-old
 
 [Action]
 Description = update kernel in efi partition
 When = PostTransaction
-Exec = /usr/bin/efi_update linux
+Exec = /usr/bin/linux%mod%_efi_upgrade

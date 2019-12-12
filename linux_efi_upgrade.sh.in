@@ -1,6 +1,18 @@
 #!/bin/bash
 LINUX=$1
+LINUX_DEFAULT="%mod%"
 [[ $1 == "-mk" ]] && LINUX=$2
+
+if [[ $LINUX == "" && $LINUX_DEFAULT == "\%mod\%" ]]; then
+	echo "Usage: efi_update [-mk] LINUX"
+	echo
+	echo "    -mk    make initramfs"
+	echo 
+	exit 1
+elif [[ $LINUX == "" && $LINUX_DEFAULT != "\%mod\%" ]]; then
+    LINUX="linux$LINUX_DEFAULT"
+fi
+
 BOOTDIR=/boot
 CERTDIR=/etc/efikeys
 KERNEL=$BOOTDIR/vmlinuz-$LINUX
@@ -21,15 +33,8 @@ OUTIMG_DIR=/boot/efi/EFI/$LINUX
 OUTIMG_BOOT=$OUTIMG_DIR/Bootx64.efi
 OUTIMG_EMERGENCY=$OUTIMG_DIR/${LINUX}-emergency.efi
 CMDLINED=/etc/cmdline.d
-
-if [[ $LINUX == "" ]]; then
-	echo "Usage: efi_update [-mk] LINUX"
-	echo
-	echo "    -mk    make initramfs"
-	echo 
-	exit 1
-fi
-
+EFI_KEY=/etc/efi.key.pem
+EFI_CRT=/etc/efi.pub.pem
 
 if [[ ! -x $EFISTUB ]]; then
 	echo "efi stub not found!"
@@ -47,7 +52,7 @@ if [[ -d $BUILDDIR ]]; then
 	exit 1
 fi
 
-[[ $1 == "-mk" ]] && mkinitcpio -p $2
+[[ $1 == "-mk" ]] && mkinitcpio -p $LINUX
 
 [[ -f /boot/amd-ucode.img ]] && INITRAMFS="/boot/amd-ucode.img $INITRAMFS"
 [[ -f /boot/intel-ucode.img ]] && INITRAMFS="/boot/intel-ucode.img $INITRAMFS"
@@ -57,7 +62,9 @@ mkdir -p $TMP
 chmod 600 $TMP
 
 echo -n "kernel param: "
-CMDLINE=$(grep -vh "#" $CMDLINED/* | sed ':a;N;$!ba;s/\n/ /g')
+
+#CMDLINE=$(grep -vh "#" $CMDLINED/* | sed ':a;N;$!ba;s/\n/ /g')
+CMDLINE=$(find $CMDLINED -type f -exec awk -F '#' '{printf $1 " "}' {} \;)
 echo $CMDLINE
 
 cat ${INITRAMFS} > $TMP_INITRD
@@ -79,10 +86,12 @@ echo $CMDLINE "emergency" > $TMP_CMDLINE_EMERGENCY
     --add-section .initrd=$TMP_INITRD --change-section-vma .initrd=0x3000000 \
     ${EFISTUB} ${TMP_EMERGENCY}
 
+if grep -i ENCRYPTED $EFI_KEY 2>&1 > /dev/null; then
+
 while :; do 
 	expect << EOF
 set timeout 120
-spawn /usr/bin/sbsign --key ${CERTDIR}/key.key --cert ${CERTDIR}/key.crt --output ${TMP_BOOT_SIGNED} ${TMP_BOOT}
+spawn /usr/bin/sbsign --key $EFI_KEY --cert $EFI_CRT --output ${TMP_BOOT_SIGNED} ${TMP_BOOT}
 expect "*?phrase:*"
 stty -echo
 expect_tty -re "(.*)\\n"
@@ -96,7 +105,7 @@ expect {
 }
 	
 
-spawn /usr/bin/sbsign --key ${CERTDIR}/key.key --cert ${CERTDIR}/key.crt --output ${TMP_EMERGENCY_SIGNED} ${TMP_EMERGENCY}
+spawn /usr/bin/sbsign --key $EFI_KEY --cert $EFI_CRT --output ${TMP_EMERGENCY_SIGNED} ${TMP_EMERGENCY}
 expect "*?phrase:*"
 send -- "\$pass"
 expect {
@@ -111,7 +120,10 @@ EOF
 		130)exit 1;;
 	esac
 done
-
+else
+    /usr/bin/sbsign --key $EFI_KEY --cert $EFI_CRT --output $TMP_BOOT_SIGNED $TMP_BOOT
+    /usr/bin/sbsign --key $EFI_KEY --cert $EFI_CRT --output $TMP_EMERGENCY_SIGNED $TMP_EMERGENCY
+fi
 mount -o rw,remount /boot/efi
 cp ${TMP_BOOT_SIGNED} ${OUTIMG_BOOT}
 cp ${TMP_EMERGENCY_SIGNED} ${OUTIMG_DIR}/$LINUX-emergency.efi

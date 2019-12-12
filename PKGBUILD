@@ -1,38 +1,43 @@
-# Maintainer: Jguer <joaogg3@gmail.com>
-pkgname=linux-efi
-pkgver=0.1.2
+# Maintainer: x1b6e6 <ftdabcde@gmail.com>
+
+mod=
+
+pkgname=linux${mod}_efi
+pkgver=0.2.0
 pkgrel=1
 pkgdesc="sign efi hook"
 arch=('any')
-depends=('sbsigntools' 'efibootmgr' 'expect')
+depends=('sbsigntools' 'efibootmgr' 'expect' 'openssl' 'efivar')
+
+CMDLINED=/etc/cmdline.d
+TMP=/tmp/linux${mod}_efi
+TMP_CMDLINED=$TMP/cmdline.di
+EFIKEYS=/etc/efikeys
 
 source=(
-	"efi_update.sh"
-	"efi_update.hook"
-	"reboot-win10"
-	"reboot-grub"
-	"efikeys.tar.xz"
-	"linux-efi.install"
+	"linux_efi_upgrade.sh.in"
+	"linux_efi.hook.in"
+	"linux_efi.install"
+	"ms.esl"
 )
 sha1sums=(
-	'e299eb6055553bc4b35274e51e3fbf13e1f5011c'
-	'00bba33f5cb898708791cf00b0bfd461d32700d4'
-	'44a1bfb86c0d2605f0fc3ba8fe345c1227dd27ee'
-	'e64a5d44dd4f4b346502a61fd7ad955191c80397'
-	'984f298fb1cd268ddc83bcaac0b868e4d2e8c92e'
-	'7f873b781daa12fbb226e7889469cf4691116191'
+	'e95bb0017d211b340239901242e557dbd8209900'
+	'9d0e53f52729f1330085e7642ef87d1430bd2c55'
+	'26e4f3bc20677acc2d59691cded9469b72ca014b'
+	'52a296ac12ed09058d227a056cf6d4b3d6ac2760'
 )
 
-install='linux-efi.install'
+install=linux_efi.install
+
+prepare() {
+	sed -e "s/%mod%/$mod/g" $srcdir/linux_efi.hook.in > $srcdir/linux${mod}_efi.hook
+	sed -e "s/%mod%/$mod/g" $srcdir/linux_efi_upgrade.sh.in > $srcdir/linux${mod}_efi_upgrade.sh
+}
 
 package() {
 	cd "$srcdir"
-	install -Dm700 "efi_update.sh" "$pkgdir/usr/bin/efi_update"
-	install -Dm700 "reboot-win10" "$pkgdir/usr/bin/reboot-win10"
-	install -Dm700 "reboot-grub" "$pkgdir/usr/bin/reboot-grub"
-	install -Dm644 "efi_update.hook" "$pkgdir/usr/share/libalpm/hooks/99-efi_update.hook"
-	install -Dm600 "key.key" "$pkgdir/etc/efikeys/key.key"
-	install -Dm600 "key.crt" "$pkgdir/etc/efikeys/key.crt"
-	install -Dm600 "efikeys.tar.xz" "$pkgdir/etc/efikeys/efikeys.tar.xz"
-	chmod -R 600 $pkgdir/etc/efikeys
+	install -Dm700 "$srcdir/linux${mod}_efi_upgrade.sh" "$pkgdir/usr/bin/linux${mod}_efi_upgrade"
+	install -Dm644 "$srcdir/linux${mod}_efi.hook" "$pkgdir/usr/share/libalpm/hooks/99-linux${mod}_efi.hook"
+	install -Dm444 "$srcdir/ms.esl" "$pkgdir$EFIKEYS/ms.esl"
 }
+# vim: set ts=4 sw=0 noexpandtab autoindent :
