@@ -1,0 +1,12 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = File
+Target = usr/lib/modules/*/vmlinuz
+Target = usr/lib/initcpio/*
+
+[Action]
+Description = update kernel in efi partition
+When = PostTransaction
+Exec = /usr/share/libalpm/scripts/linux_efi_upgrade
+NeedsTargets
