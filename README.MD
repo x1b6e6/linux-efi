@@ -28,7 +28,7 @@ pacman -Sy sbsigntools efibootmgr expect openssl efivar
 
 ## Installing
 ```bash
-git clone https://github.com/x1b6e6/linux-efi.git
-cd linux-efi
+git clone https://github.com/x1b6e6/linux-efi.pkgbuild.git
+cd linux-efi.pkgbuild
 makepkg --install
 ```
