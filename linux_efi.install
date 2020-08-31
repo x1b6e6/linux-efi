@@ -1,7 +1,7 @@
 
 CMDLINED=/etc/cmdline.d
-TMP=/tmp/linux${mod}_efi
-TMP_CMDLINED=$TMP/cmdline.di
+TMP=/tmp/linux_efi
+TMP_CMDLINED=$TMP/cmdline.d
 EFIKEYS=/etc/efikeys
 
 pre_upgrade() {
@@ -27,12 +27,12 @@ post_install() {
 		return
 	fi
 
-	[[ -e /etc/efi.key.pem || -e /etc/efi.pub.pem ]] && 
-		echo "warn: keys already generated. skip generate new keys" || 
+	[[ -e /etc/efi.key.pem && -e /etc/efi.pub.pem ]] && 
+		echo "warn: keys already generated. skip generating new keys" || 
 		keys_gen_install
 
 	[[ -e $CMDLINED ]] && 
-		echo "warn: $CMDLINED already exists. skip generate new configs" || 
+		echo "warn: $CMDLINED already exists. skip generating new configs" || 
 		cmdlined_gen_install
 
 	# TODO: check enable SecureBoot, and try install certs to it
@@ -54,7 +54,7 @@ keys_gen_install() {
     # convert public key to efi sign list
 	cert-to-efi-sig-list $TMP/pub.pem $TMP/efi.esl || err converting pub key to efi sign list
 
-	# add to list MicroSoft keys for supporting dualboot
+	# add to list Microsoft keys for supporting dualboot
 	cat $EFIKEYS/ms.esl $TMP/efi.esl > $TMP/db.esl
 
 	# signing keys for using secureboot
@@ -70,18 +70,6 @@ keys_gen_install() {
 	install -Dm444 $TMP/PK.auth $EFIKEYS/
 	install -Dm444 $TMP/KEK.auth $EFIKEYS/
 	install -Dm444 $TMP/db.auth $EFIKEYS/
-
-	# cleanup $TMP dir
-	rm $TMP/key.pem
-	rm $TMP/pub.pem
-
-	rm $TMP/efi.esl
-
-	rm $TMP/db.esl
-
-	rm $TMP/PK.auth
-	rm $TMP/KEK.auth
-	rm $TMP/db.auth
 }
 
 _cmdwrite() {
