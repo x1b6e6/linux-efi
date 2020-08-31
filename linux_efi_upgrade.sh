@@ -4,12 +4,10 @@ while read -r pkgbase; do
 
 grep -e "\busr/lib/modules/[[:alnum:][:punct:]]*/vmlinuz\b" <<< "$pkgbase" || continue;
 
-
 KERNEL=/$pkgbase
-pkgbase=$(awk -F/ '{print $4}' <<< "$pkgbase")
-pkgbase=$(awk -F- '{print $4}' <<< "$pkgbase")
-[[ $pkgbase != "" ]] && pkgbase="-$pkgbase"
-pkgbase="linux$pkgbase"
+pkgbase=$(pacman -Qo $KERNEL)
+
+[[ "$pkgbase" == "" ]] && exit 1;
 
 # set 1, if you want generate boot file with emergency cmdline
 GENERATE_EMERGENCY=0
@@ -17,7 +15,6 @@ GENERATE_EMERGENCY=0
 LINUX=$pkgbase
 BOOTDIR=/boot
 CERTDIR=/etc/efikeys
-# KERNEL=$BOOTDIR/vmlinuz-$LINUX
 INITRAMFS=/boot/initramfs-${LINUX}.img
 EFISTUB=/usr/lib/systemd/boot/efi/linuxx64.efi.stub
 TMP=/tmp/$RANDOM
@@ -83,7 +80,6 @@ fi
 [[ -f /boot/intel-ucode.img ]] && INITRAMFS="/boot/intel-ucode.img $INITRAMFS"
 
 mkdir -p $TMP
-#mount -t tmpfs none $BUILDDIR
 chmod 600 $TMP
 
 
@@ -138,9 +134,7 @@ cp ${TMP_BOOT_SIGNED} ${OUTIMG_BOOT}
 cp ${TMP_EMERGENCY_SIGNED} ${OUTIMG_DIR}/$LINUX-emergency.efi
 mount -o ro,remount /boot/efi
 
-#umount $BUILDDIR
 rm -rf $BUILDDIR
-
 
 # TODO: adding to efi boot list
 done
