@@ -3,32 +3,33 @@
 Only for Arch-based Linux Systems.
 
 ## About
-This script split `/boot/vmlinuz-linux`, from `linux` package, and `/boot/initramfs-linux.img`, generated via `mkinitcpio`, into one EFI executable file. Also, your    `cmdline` is configuring into `/etc/cmdline.d/`.
+This script is spliting `/boot/vmlinuz-linux`, from `linux` or other packages, and `/boot/initramfs-linux.img`, generated via `mkinitcpio`, into one EFI executable file.
 
 ## Where it saved?
-This script save your EFI app into `/boot/efi/EFI/linux/bootx64.efi`
+This script save your EFI app into `/boot/efi/EFI/{Kernel packet}/Bootx64.efi`
+For example: 
+* for `linux`    : `/boot/efi/EFI/linux/Bootx64.efi`
+* for `linux-lts`: `/boot/efi/EFI/linux-lts/Bootx64.efi`
+* for `linux-git`: `/boot/efi/EFI/linux-git/Bootx64.efi`
+* for `linux-zen` ...etc
+
 
 ## New folder `/etc/cmdline.d/`
-This folder work as anouther folder with postfix `.d`. Rreading all text from files in this folder, and add it to ended `cmdline` (w/o lines, what started from `#`)
+Generate string of kernel arguments from files in `/etc/cmdline.d/`. Comment lines start from `#`.
 
 ## EFI SecureBoot
-This script sign all generated EFI app with keys, what generated at installation (if you already have keys, this step skipping).
+This script signing all generated EFI app with generated keys.
 - private at `/etc/efi.key.pem`
 - public  at `/etc/efi.pub.pem`
 
-after generating, you must install this key manualy:
+you must install this keys in EFI manualy:
 - PK : `/etc/PK.auth`
 - KEK: `/etc/KEK.auth`
 - db : `/etc/db.auth`
 
-## Install dependencies
-```bash
-pacman -Sy sbsigntools efibootmgr expect openssl efivar
-```
-
-## Installing
+## Build and install
 ```bash
 git clone https://github.com/x1b6e6/linux-efi.pkgbuild.git
 cd linux-efi.pkgbuild
-makepkg --install
+makepkg -si
 ```
