@@ -20,18 +20,18 @@ source=(
 sha1sums=(
 	'0315c19cdde5044db2a6cf26c9f2a48bf32f6d8e'
 	'c9a8e9fdd431b22837e32af123dc91c9eb5f1b8d'
-	'de886dec8eecc62be07ffac3e6bc28b22cbc8802'
+	'9ded1892efee1b7474496905050dd1970c0c5dab'
 	'db7ef2c3bcb35979607abad0c6f415546b7da003'
 	'22594e7c709142c790bf56925c203544e433c148'
 )
 
 prepare(){
 	# clean file
-	echo "" > $srcdir/mc.esl
+	echo "" > $srcdir/ms.esl
 
 	# install additional certs
-	((INSTALL_MS_ROOT)) && cat $srcdir/msRoot.esl >> mc.esl
-	((INSTALL_MS_THIRDPARTY)) && cat $srcdir/msThirdParty.esl >> mc.esl
+	((INSTALL_MS_ROOT)) && cat $srcdir/msRoot.esl >> ms.esl
+	((INSTALL_MS_THIRDPARTY)) && cat $srcdir/msThirdParty.esl >> ms.esl
 }
 
 install=linux_efi.install
