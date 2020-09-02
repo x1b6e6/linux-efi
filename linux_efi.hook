@@ -4,6 +4,7 @@ Operation = Upgrade
 Type = File
 Target = usr/lib/modules/*/vmlinuz
 Target = usr/lib/initcpio/*
+Target = usr/lib/systemd/boot/efi/linuxx64.efi.stub
 
 [Action]
 Description = update kernel in efi partition
