@@ -1,11 +1,11 @@
 # Maintainer: x1b6e6 <ftdabcde@gmail.com>
 
 pkgname=linux_efi
-pkgver=0.2.1
+pkgver=0.2.2
 pkgrel=1
 pkgdesc="sign efi hook"
 arch=('any')
-depends=('sbsigntools' 'efibootmgr' 'expect' 'openssl' 'efivar')
+depends=('sbsigntools' 'efibootmgr' 'expect' 'openssl' 'efivar' 'llvm')
 
 INSTALL_MS_THIRDPARTY=1 # for thirdparty devices and software signed with Microsoft (such as VeraCrypt)
 INSTALL_MS_ROOT=1       # for booting official Windows
@@ -18,7 +18,7 @@ source=(
 	"msThirdParty.esl"
 )
 sha1sums=(
-	'0315c19cdde5044db2a6cf26c9f2a48bf32f6d8e'
+	'63b3adf366323b2e154a91b75d20993e6d00cf4f'
 	'c9a8e9fdd431b22837e32af123dc91c9eb5f1b8d'
 	'9ded1892efee1b7474496905050dd1970c0c5dab'
 	'db7ef2c3bcb35979607abad0c6f415546b7da003'
