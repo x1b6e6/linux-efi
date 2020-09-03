@@ -103,12 +103,14 @@ done
 	mount -orw,remount ${EFI_MOUNT_POINT}
 
 for PKG in $PKGS_UPDATE; do
-	EFI_APPLICATION=${EFI_MOUNT_POINT}/EFI/${PKG}/Bootx64.efi
+	EFI_APPLICATION_DIR=${EFI_MOUNT_POINT}/EFI/${PKG}
+	EFI_APPLICATION=${EFI_APPLICATION_DIR}/Bootx64.efi
 
 	# DON'T TOUCH NEXT LINE
 	TMP_EFI_APPLICATION_SIGNED="/tmp/linux-efi-${PKG}-application-signed.efi"
 
 	# copy result to efi partition
+	mkdir -p ${EFI_APPLICATION_DIR}
 	cp ${TMP_EFI_APPLICATION_SIGNED} ${EFI_APPLICATION}
 
 	# remove temporary signed efi application
