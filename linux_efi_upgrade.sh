@@ -63,13 +63,20 @@ for KFile in ${KERN_FILES}; do
 
 	echo ${CMDLINE} > ${TMP_KERNEL_PARAMS}
 
+	/usr/bin/llvm-objcopy \
+		-R .osrel \
+		-R .cmdline \
+		-R .linux \
+		-R .initrd \
+		${EFISTUB} ${TMP_EFI_APPLICATION}
+
 	# add sections
 	/usr/bin/llvm-objcopy \
         --add-section .osrel=/etc/os-release        \
         --add-section .cmdline=${TMP_KERNEL_PARAMS} \
         --add-section .linux=${KERNEL_IMAGE}        \
         --add-section .initrd=${TMP_INITRAMFS}      \
-        ${EFISTUB} ${TMP_EFI_APPLICATION}
+        ${TMP_EFI_APPLICATION} ${TMP_EFI_APPLICATION}
 	
 	# change vma of sections
 	/usr/bin/objcopy \
