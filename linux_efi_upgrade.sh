@@ -90,7 +90,7 @@ for KFile in ${KERN_FILES}; do
 	PKGS_UPDATE="${PKGS_UPDATE} ${PKG}"
 
 	# clear temporary files
-	# rm ${TMP_EFI_APPLICATION} ${TMP_INITRAMFS} ${TMP_KERNEL_PARAMS}
+	rm ${TMP_EFI_APPLICATION} ${TMP_INITRAMFS} ${TMP_KERNEL_PARAMS}
 done
 
 # remount efi mount point with rw privileges
@@ -109,7 +109,7 @@ for PKG in $PKGS_UPDATE; do
 	cp ${TMP_EFI_APPLICATION_SIGNED} ${EFI_APPLICATION}
 
 	# remove temporary signed efi application
-	# rm ${TMP_EFI_APPLICATION_SIGNED}
+	rm ${TMP_EFI_APPLICATION_SIGNED}
 done
 
 # remount efi mount point with default options

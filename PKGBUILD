@@ -18,7 +18,7 @@ source=(
 	"msThirdParty.esl"
 )
 sha1sums=(
-	'4696c40a550f3c9c813b8bbacad1d129e648bda6'
+	'9e4085daa8deb78479268105f2716045028daf48'
 	'7e280fafba7f5acc96488d30e694dcf45f09a979'
 	'9ded1892efee1b7474496905050dd1970c0c5dab'
 	'db7ef2c3bcb35979607abad0c6f415546b7da003'
