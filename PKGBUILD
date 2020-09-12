@@ -1,7 +1,7 @@
 # Maintainer: x1b6e6 <ftdabcde@gmail.com>
 
 pkgname=linux_efi
-pkgver=0.2.3
+pkgver=0.2.4
 pkgrel=1
 pkgdesc="sign efi hook"
 arch=('any')
