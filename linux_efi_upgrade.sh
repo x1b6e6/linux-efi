@@ -25,7 +25,6 @@ while read -r UPDFILE; do
 		    [[ "usr/lib/systemd/boot/efi/linuxx64.efi.stub" == "${UPDFILE}" ]]; then
 
 		echo UPDATE ALL KERNELS >&2
-		# TODO: add to KERN_FILES all kernel files
 		KERN_FILES="$(find /usr/lib/modules/ -mindepth 2 -maxdepth 2 -type f -name vmlinuz)"
 		break;
 	fi
