@@ -56,10 +56,6 @@ for KFile in ${KERN_FILES}; do
 	TMP_EFI_APPLICATION_SIGNED="/tmp/linux-efi-${PKG}-application-signed.efi"
 
 	cat ${INITRAMFS} ${ADDITIONAL_INITRAMFS} > ${TMP_INITRAMFS} 2>/dev/null
-	if ! [[ -f ${TMP_INITRAMFS} ]]; then
-		echo ${TMP_INITRAMFS} not exist
-		exit 1
-	fi
 
 	echo ${CMDLINE} > ${TMP_KERNEL_PARAMS}
 
