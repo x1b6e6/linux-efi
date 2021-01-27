@@ -5,7 +5,7 @@ pkgver=0.2.4
 pkgrel=1
 pkgdesc="sign efi hook"
 arch=('any')
-depends=('sbsigntools' 'efibootmgr' 'expect' 'openssl' 'efivar' 'llvm')
+depends=('sbsigntools' 'efibootmgr' 'expect' 'openssl' 'efivar' 'llvm' 'efitools')
 
 INSTALL_MS_THIRDPARTY=1 # for thirdparty devices and software signed with Microsoft (such as VeraCrypt)
 INSTALL_MS_ROOT=1       # for booting official Windows
