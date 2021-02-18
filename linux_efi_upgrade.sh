@@ -1,9 +1,5 @@
 #!/bin/sh
 
-# settings constants
-EFI_MOUNT_POINT="/boot/efi"
-EFI_MOUNT_READONLY=1
-
 # constants
 CERT_DIR="/etc/efikeys"
 CMDLINED="/etc/cmdline.d"
@@ -93,12 +89,8 @@ for KFile in ${KERN_FILES}; do
 	rm ${TMP_EFI_APPLICATION} ${TMP_INITRAMFS} ${TMP_KERNEL_PARAMS}
 done
 
-# remount efi mount point with rw privileges
-((EFI_MOUNT_READONLY)) && \
-	mount -orw,remount ${EFI_MOUNT_POINT}
-
 for PKG in $PKGS_UPDATE; do
-	EFI_APPLICATION_DIR=${EFI_MOUNT_POINT}/EFI/${PKG}
+	EFI_APPLICATION_DIR=/boot/EFI/${PKG}
 	EFI_APPLICATION=${EFI_APPLICATION_DIR}/Bootx64.efi
 
 	# DON'T TOUCH NEXT LINE
@@ -111,9 +103,5 @@ for PKG in $PKGS_UPDATE; do
 	# remove temporary signed efi application
 	rm ${TMP_EFI_APPLICATION_SIGNED}
 done
-
-# remount efi mount point with default options
-((EFI_MOUNT_READONLY)) && \
-	mount -oremount ${EFI_MOUNT_POINT}
 
 # vim: set ts=4 sw=4 :

@@ -1,7 +1,7 @@
 # Maintainer: x1b6e6 <ftdabcde@gmail.com>
 
 pkgname=linux-efi
-pkgver=0.2.4
+pkgver=0.3.0
 pkgrel=1
 pkgdesc="sign efi hook"
 arch=('any')
@@ -17,13 +17,11 @@ source=(
 	"msRoot.esl"
 	"msThirdParty.esl"
 )
-sha1sums=(
-	'9e4085daa8deb78479268105f2716045028daf48'
-	'7e280fafba7f5acc96488d30e694dcf45f09a979'
-	'9ded1892efee1b7474496905050dd1970c0c5dab'
-	'db7ef2c3bcb35979607abad0c6f415546b7da003'
-	'22594e7c709142c790bf56925c203544e433c148'
-)
+sha1sums=('4270a0cf42aaf65b3072228084e00c6dad982de4'
+          '7e280fafba7f5acc96488d30e694dcf45f09a979'
+          '9ded1892efee1b7474496905050dd1970c0c5dab'
+          'db7ef2c3bcb35979607abad0c6f415546b7da003'
+          '22594e7c709142c790bf56925c203544e433c148')
 
 prepare(){
 	# clean file
