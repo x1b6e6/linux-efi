@@ -1,7 +1,5 @@
 
-CMDLINED=/etc/cmdline.d
 TMP=/tmp/linux_efi
-TMP_CMDLINED=$TMP/cmdline.d
 EFIKEYS=/etc/efikeys
 
 pre_upgrade() {
@@ -30,10 +28,6 @@ post_install() {
 	[[ -e /etc/efi.key.pem && -e /etc/efi.pub.pem ]] && 
 		echo "warn: keys already generated. skip generating new keys" || 
 		keys_gen_install
-
-	[[ -e $CMDLINED ]] && 
-		echo "warn: $CMDLINED already exists. skip generating new configs" || 
-		cmdlined_gen_install
 
 	# TODO: check enable SecureBoot, and try install certs to it
 
@@ -72,38 +66,4 @@ keys_gen_install() {
 	install -Dm444 $TMP/db.auth $EFIKEYS/
 }
 
-_cmdwrite() {
-	local TMP=$3
-	local FILE=$CMDLINED/$(printf "%02d" $1)-$2.conf
-	[[ -e $FILE ]] && TMP="$(cat $FILE)\n$TMP"
-	echo $TMP > $FILE
-}
-
-cmdlined_gen_install() {
-	local CMDLINE=$(cat /proc/cmdline)
-
-	if [[ -e $CMDLINED ]]; then
-		echo "$CMDLINED already exists, abort"
-		return
-	fi
-
-	mkdir $TMP_CMDLINED
-
-	for var in $CMDLINE; do
-		local varname=$(awk -F=' ' '{print $1}' <<< "$var")
-
-		case $varname in
-			root,ro,rw)
-				_cmdwrite 0 root "$var";;
-			cryptdevice,cryptkey)
-				_cmdwrite 5 crypto "$var";;
-			resume)
-				_cmdwrite 10 resume "$var";;
-			quiet,splash,emergency,rescue);;
-			*)
-				_cmdwrite 20 $varname "$var";;
-		esac
-	done
-}
- 
 # vim: set ts=4 sw=0 noexpandtab autoindent :

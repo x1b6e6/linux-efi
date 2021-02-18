@@ -2,7 +2,6 @@
 
 # constants
 CERT_DIR="/etc/efikeys"
-CMDLINED="/etc/cmdline.d"
 EFI_KEY="/etc/efi.key.pem"
 EFI_CRT="/etc/efi.pub.pem"
 EFISTUB="/usr/lib/systemd/boot/efi/linuxx64.efi.stub"
@@ -40,19 +39,17 @@ for KFile in ${KERN_FILES}; do
 
 	echo UPDATE ${PKG} >&2
 
-	CMDLINE=$(find ${CMDLINED} -type f -exec awk -F '#' '{printf $1 " "}' {} \;)
 	INITRAMFS="/boot/initramfs-${PKG}.img"
+	CMDLINE="/etc/cmdline-${PKG}"
+	[[ ! -f $CMDLINE ]] && cp /proc/cmdline $CMDLINE
 	
 	TMP_EFI_APPLICATION="/tmp/linux-efi-${PKG}-application.efi"
-	TMP_KERNEL_PARAMS="/tmp/linux-efi-kernel-params"
 	TMP_INITRAMFS="/tmp/linux-efi-initramfs.img"
 
 	# DON'T TOUCH NEXT LINE
 	TMP_EFI_APPLICATION_SIGNED="/tmp/linux-efi-${PKG}-application-signed.efi"
 
 	cat ${INITRAMFS} ${ADDITIONAL_INITRAMFS} > ${TMP_INITRAMFS} 2>/dev/null
-
-	echo ${CMDLINE} > ${TMP_KERNEL_PARAMS}
 
 	/usr/bin/llvm-objcopy \
 		-R .osrel \
@@ -64,7 +61,7 @@ for KFile in ${KERN_FILES}; do
 	# add sections
 	/usr/bin/llvm-objcopy \
         --add-section .osrel=/etc/os-release        \
-        --add-section .cmdline=${TMP_KERNEL_PARAMS} \
+        --add-section .cmdline=${CMDLINE}           \
         --add-section .linux=${KERNEL_IMAGE}        \
         --add-section .initrd=${TMP_INITRAMFS}      \
         ${TMP_EFI_APPLICATION} ${TMP_EFI_APPLICATION}
@@ -86,7 +83,7 @@ for KFile in ${KERN_FILES}; do
 	PKGS_UPDATE="${PKGS_UPDATE} ${PKG}"
 
 	# clear temporary files
-	rm ${TMP_EFI_APPLICATION} ${TMP_INITRAMFS} ${TMP_KERNEL_PARAMS}
+	rm ${TMP_EFI_APPLICATION} ${TMP_INITRAMFS}
 done
 
 for PKG in $PKGS_UPDATE; do
