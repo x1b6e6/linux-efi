@@ -49,7 +49,7 @@ for KFile in ${KERN_FILES}; do
 	# DON'T TOUCH NEXT LINE
 	TMP_EFI_APPLICATION_SIGNED="/tmp/linux-efi-${PKG}-application-signed.efi"
 
-	cat ${INITRAMFS} ${ADDITIONAL_INITRAMFS} > ${TMP_INITRAMFS} 2>/dev/null
+	cat ${ADDITIONAL_INITRAMFS} ${INITRAMFS} > ${TMP_INITRAMFS} 2>/dev/null
 
 	/usr/bin/llvm-objcopy \
 		-R .osrel \
