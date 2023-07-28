@@ -1,7 +1,7 @@
 # Maintainer: x1b6e6 <ftdabcde@gmail.com>
 
 pkgname=linux-efi
-pkgver=1.0.0
+pkgver=1.0.1
 pkgrel=1
 pkgdesc="sign efi hook"
 arch=('any')
@@ -14,8 +14,8 @@ source=(
 	"linux-efi-upgrade.sh"
 	"linux-efi.hook"
 )
-sha1sums=('1f05c24c60f80b8d1be61dcffbfebc36233b4aaa'
-          '9d26bc4f66202c03c8c15d2cc2a59cf9c95b1abd')
+sha1sums=('75eaa53a4e02d8903b91d9480587c8bc612e8586'
+          '3d9dcc21ede673f622759dac2e8d8441a5ffd3b8')
 
 package() {
 	cd "$srcdir"

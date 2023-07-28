@@ -1,39 +1,34 @@
-#!/bin/sh
+#!/bin/bash
 
-# list of files what need update (generating automaticaly)
-KERN_FILES=""
+package=0
 
-# generate KERN_FILES
-while read -r UPDFILE; do
-		
-	if \
-			# check updated initcpio
-			grep -e "\busr/lib/initcpio/[[:alnum:][:punct:]]*" <<< "${UPDFILE}" || \
-			# check updated efistub
-		    [[ "usr/lib/systemd/boot/efi/linuxx64.efi.stub" == "${UPDFILE}" ]]; then
+packages=()
 
-		echo UPDATE ALL KERNELS >&2
-		KERN_FILES="$(find /usr/lib/modules/ -mindepth 2 -maxdepth 2 -type f -name vmlinuz)"
-		break;
+while read -r line; do
+	if [[ "$line" != */vmlinuz ]]; then
+		package=1
+		continue
 	fi
 
-	# check updated only kernel
-	if grep -e "\busr/lib/modules/[[:alnum:][:punct:]]*/vmlinuz\b" <<< "${UPDFILE}"; then
-		KERN_FILES="${KERN_FILES} /${UPDFILE}"
+	if ! read -r pkgbase &>/dev/null < "${line%/vmlinuz}"/pkgbase; then
+		continue
 	fi
+
+	packages+=("$pkgbase")
 done
 
-PKGS_UPDATE=""
+if (($package)); then
+	packages=()
+	for file in /etc/cmdline-*; do
+		filename=$(basename "$file")
+		suffix=${filename#cmdline-}
+		packages+=("$suffix")
+	done
+fi
 
-# proccess KERN_FILES
-for KFile in ${KERN_FILES}; do
-	KERNEL_IMAGE="${KFile}"
-	PKG=$(pacman -Qo ${KERNEL_IMAGE} | cut -f5 -d ' ')
-
-	echo UPDATE ${PKG} >&2
-
-	linux-sign "${PKG}" "/boot/EFI/${PKG}/Bootx64.efi"
-
+for pkgbase in "${packages[@]}"; do
+	echo Update EFI for $pkgbase >&2
+	linux-sign "$pkgbase" "/boot/EFI/$pkgbase/Bootx64.efi"
 done
 
 # vim: set ts=4 sw=4 :

@@ -7,7 +7,7 @@ Target = usr/lib/initcpio/*
 Target = usr/lib/systemd/boot/efi/linuxx64.efi.stub
 
 [Action]
-Description = update kernel in efi partition
+Description = Update UKIs
 When = PostTransaction
 Exec = /usr/share/libalpm/scripts/linux-efi-upgrade
 NeedsTargets
