@@ -28,7 +28,7 @@ fi
 
 for pkgbase in "${packages[@]}"; do
 	echo Update EFI for $pkgbase >&2
-	linux-sign "$pkgbase" "/boot/EFI/$pkgbase/Bootx64.efi"
+	/usr/lib/systemd/ukify /boot/vmlinuz-"$pkgbase" /boot/initramfs-"$pkgbase".img --cmdline @/etc/cmdline-"$pkgbase" --secureboot-private-key /etc/efi.key.pem --secureboot-certificate /etc/efi.pub.pem -o /boot/EFI/"$pkgbase"/Bootx64.efi >/dev/null
 done
 
 # vim: set ts=4 sw=4 :

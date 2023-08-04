@@ -1,20 +1,20 @@
 # Maintainer: x1b6e6 <ftdabcde@gmail.com>
 
 pkgname=linux-efi
-pkgver=1.0.1
+pkgver=1.0.3
 pkgrel=1
 pkgdesc="sign efi hook"
 arch=('any')
 depends=(
 	'pacman'
-	'linux-sign'
+	'systemd-ukify'
 )
 
 source=(
 	"linux-efi-upgrade.sh"
 	"linux-efi.hook"
 )
-sha1sums=('75eaa53a4e02d8903b91d9480587c8bc612e8586'
+sha1sums=('11780769a58eae1e57e230e1f069923fcecae543'
           '3d9dcc21ede673f622759dac2e8d8441a5ffd3b8')
 
 package() {
